@@ -29,7 +29,7 @@ void* sharedMemPtr;
  * @param msqid - the id of the shared memory
  */
 
-void init(int* shmid, int* msqid, void** sharedMemPtr){
+void init(int* shmid, int* msqid, void** sharedMemPtr) {
         /* TODO:
            1. Create a file called keyfile.txt containing string "Hello world" (you may do
            so manually or from the code).
@@ -86,7 +86,7 @@ void init(int* shmid, int* msqid, void** sharedMemPtr){
  * @param msqid - the id of the message queue
  */
 
-void cleanUp(const int* shmid, const int* msqid, void** sharedMemPtr){
+void cleanUp(const int* shmid, const int* msqid, void** sharedMemPtr) {
         /* TODO: Detach from shared memory */
         shmdt(sharedMemPtr);
 
@@ -99,7 +99,7 @@ void cleanUp(const int* shmid, const int* msqid, void** sharedMemPtr){
  * The main send function
  * @param fileName - the name of the file
  */
-void send_t(const char* fileName){
+void send_t(const char* fileName) {
         /* Open the file for reading */
         FILE* fp = fopen(fileName, "r");
 
@@ -164,7 +164,7 @@ void send_t(const char* fileName){
         fclose(fp);
 }
 
-int main(int argc, char** argv){
+int main(int argc, char** argv) {
         /* Check the command line arguments */
         if (argc < 2) {
                 fprintf(stderr, "USAGE: %s <FILE NAME>\n", argv[0]);
