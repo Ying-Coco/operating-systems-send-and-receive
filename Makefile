@@ -1,2 +1,2 @@
 uncrustify:
-	uncrustify --replace -c style.cfg *.c
+	uncrustify --replace --no-backup -c style.cfg *.c
