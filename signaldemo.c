@@ -19,28 +19,28 @@ int count = 9;
  */
 
 void signalHandlerFunc(int arg) {
-        /* We can take more Ctrl-Cs */
-        if (count > 0) {
-                fprintf(stderr, "Haha I have %d lives!\n", count);
-        } else {
-                fprintf(stderr, "Ahh you got me!\n");
-                exit(0);
-        }
+    /* We can take more Ctrl-Cs */
+    if (count > 0) {
+        fprintf(stderr, "Haha I have %d lives!\n", count);
+    } else {
+        fprintf(stderr, "Ahh you got me!\n");
+        exit(0);
+    }
 
-        --count;
+    --count;
 }
 
 int main() {
-        /* Overide the default signal handler for the
-         * SIGINT signal with signalHandlerFunc
-         */
-        signal(SIGINT, signalHandlerFunc);
+    /* Overide the default signal handler for the
+     * SIGINT signal with signalHandlerFunc
+     */
+    signal(SIGINT, signalHandlerFunc);
 
-        /* Spin the loop forever */
-        for (;; ) {
-                sleep(1);
-        }
+    /* Spin the loop forever */
+    for (;; ) {
+        sleep(1);
+    }
 
-        return 0;
+    return 0;
 }
 
