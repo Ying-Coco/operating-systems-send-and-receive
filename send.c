@@ -12,7 +12,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "msg.h"    /* For the message struct */
+/* For the message struct */
+#include "msg.h"
 
 /* The size of the shared memory chunk */
 #define SHARED_MEMORY_CHUNK_SIZE 1000
@@ -28,11 +29,8 @@ void* sharedMemPtr;
  * @param shmid - the id of the allocated shared memory
  * @param msqid - the id of the shared memory
  */
-
 void init(int* shmid, int* msqid, void** sharedMemPtr) {
     /* TODO:
-       1. Create a file called keyfile.txt containing string "Hello world" (you may do
-       so manually or from the code).
        2. Use ftok("keyfile.txt", 'a') in order to generate the key.
        3. Use the key in the TODO's below. Use the same key for the queue
        and the shared memory segment. This also serves to illustrate the difference
@@ -43,7 +41,7 @@ void init(int* shmid, int* msqid, void** sharedMemPtr) {
      */
 
     key_t key;
-    const char *path = "/keyfile.txt";
+    const char *path = "./keyfile.txt";
     FILE *filePtr;
 
     filePtr = fopen(path, "rw");
@@ -52,17 +50,16 @@ void init(int* shmid, int* msqid, void** sharedMemPtr) {
         exit(1);
     }
 
+    // put the Hello world string into the keyfile
     fputs("Hello World", filePtr);
     rewind(filePtr);
     key = ftok("keyfile.txt", 'a');
 
-    /* TODO: Get the id of the shared memory segment. The size of the segment must be SHARED_MEMORY_CHUNK_SIZE */
     if ((*shmid = shmget(key, SHARED_MEMORY_CHUNK_SIZE, IPC_CREAT | 0666)) < 0) {
         perror("ERROR:: shmget");
         exit(1);
     }
 
-    /* TODO: Attach to the shared memory */
     if ((*sharedMemPtr = shmat(*shmid, NULL, 0)) == (char*)-1) {
         perror("ERROR:: shmat");
         exit(1);
@@ -105,11 +102,11 @@ void send_t(const char* fileName) {
 
 
     /* A buffer to store message we will send to the receiver. */
-    message sndMsg;
+    struct message sndMsg;
     sndMsg.mtype = SENDER_DATA_TYPE;
 
     /* A buffer to store message received from the receiver. */
-    message rcvMsg;
+    struct message rcvMsg;
     rcvMsg.mtype = RECV_DONE_TYPE;
 
     /* Was the file open? */
@@ -132,16 +129,16 @@ void send_t(const char* fileName) {
         /* TODO: Send a message to the receiver telling him that the data is ready
          * (message of type SENDER_DATA_TYPE)
          */
-
-        if (msgsnd(msqid, &sndMsg, (sizeof(message) - sizeof(long)), 0) < 0) {
+        if (msgsnd(msqid, &sndMsg, (sizeof(struct message) - sizeof(long)), 0) < 0) {
             perror("ERROR:: msgsnd\n");
             exit(1);
         }
+
         /* TODO: Wait until the receiver sends us a message of type RECV_DONE_TYPE telling us
          * that he finished saving the memory chunk.
          */
 
-        if (msgrcv(msqid, &rcvMsg, (sizeof(message) - sizeof(long)), rcvMsg.mtype, 0) < 0) {
+        if (msgrcv(msqid, &rcvMsg, (sizeof(struct message) - sizeof(long)), rcvMsg.mtype, 0) < 0) {
             perror("ERROR:: msgrcv\n");
             exit(1);
         }
@@ -155,7 +152,7 @@ void send_t(const char* fileName) {
 
     sndMsg.size = 0;
 
-    if (msgsnd(msqid, &sndMsg, (sizeof(message) - sizeof(long)), 0) < 0) {
+    if (msgsnd(msqid, &sndMsg, (sizeof(struct message) - sizeof(long)), 0) < 0) {
         perror("ERROR:: msgsnd\n");
         exit(1);
     }
