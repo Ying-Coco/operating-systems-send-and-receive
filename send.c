@@ -82,7 +82,6 @@ void init(int* shmid, int* msqid, void** sharedMemPtr) {
  * @param shmid - the id of the shared memory segment
  * @param msqid - the id of the message queue
  */
-
 void cleanUp(const int* shmid, const int* msqid, void** sharedMemPtr) {
     /* TODO: Detach from shared memory */
     shmdt(sharedMemPtr);
@@ -99,7 +98,6 @@ void cleanUp(const int* shmid, const int* msqid, void** sharedMemPtr) {
 void send_t(const char* fileName) {
     /* Open the file for reading */
     FILE* fp = fopen(fileName, "r");
-
 
     /* A buffer to store message we will send to the receiver. */
     struct message sndMsg;
@@ -137,19 +135,16 @@ void send_t(const char* fileName) {
         /* TODO: Wait until the receiver sends us a message of type RECV_DONE_TYPE telling us
          * that he finished saving the memory chunk.
          */
-
         if (msgrcv(msqid, &rcvMsg, (sizeof(struct message) - sizeof(long)), rcvMsg.mtype, 0) < 0) {
             perror("ERROR:: msgrcv\n");
             exit(1);
         }
     }
 
-
     /** TODO: once we are out of the above loop, we have finished sending the file.
      * Lets tell the receiver that we have nothing more to send. We will do this by
      * sending a message of type SENDER_DATA_TYPE with size field set to 0.
      */
-
     sndMsg.size = 0;
 
     if (msgsnd(msqid, &sndMsg, (sizeof(struct message) - sizeof(long)), 0) < 0) {

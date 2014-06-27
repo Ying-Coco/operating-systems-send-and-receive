@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include "msg.h"    /* For the message struct */
 
-
 /* The size of the shared memory chunk */
 #define SHARED_MEMORY_CHUNK_SIZE 1000
 
@@ -19,14 +18,12 @@ void *sharedMemPtr;
 /* The name of the received file */
 const char recvFileName[] = "recvfile";
 
-
 /**
  * Sets up the shared memory segment and message queue
  * @param shmid - the id of the allocated shared memory
  * @param msqid - the id of the shared memory
  * @param sharedMemPtr - the pointer to the shared memory
  */
-
 void init(int* shmid, int* msqid, void** sharedMemPtr) {
     /* Store the IDs and the pointer to the shared memory region in the
      * corresponding parameters */
@@ -42,7 +39,6 @@ void init(int* shmid, int* msqid, void** sharedMemPtr) {
         exit(1);
     }
 }
-
 
 /**
  * The main loop
@@ -94,8 +90,6 @@ void mainLoop() {
         }
     }
 }
-
-
 
 /**
  * Perfoms the cleanup functions
