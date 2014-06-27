@@ -1,5 +1,4 @@
-/* The information type */ 
-
+/* The information type */
 #define SENDER_DATA_TYPE 1
 
 /* The done message */
@@ -8,8 +7,6 @@
 /**
  * The message structure
  */
-
-
 struct message
 {
     /* The message type */
