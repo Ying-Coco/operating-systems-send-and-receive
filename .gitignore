@@ -24,4 +24,5 @@
 
 /recv
 /send
-.local.vimrc
+/.local.vimrc
+/.vagrant
