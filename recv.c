@@ -55,7 +55,6 @@ void init() {
  */
 void mainLoop() {
     /* The size of the mesage */
-    int size_of_last_message = 0;
     int rc = 0;
 
     const int size_of_each_message = sizeof(struct message) - sizeof(long);
@@ -85,20 +84,20 @@ void mainLoop() {
      * NOTE: the received file will always be saved into the file called
      * "recvfile"
      */
-    size_of_last_message = msgrcv(msqid, &rcvMsg, size_of_each_message, SENDER_DATA_TYPE, 0);
-    if (size_of_last_message < 0) {
+    rc = msgrcv(msqid, &rcvMsg, size_of_each_message, rcvMsg.mtype, 0);
+    if (rc < 0) {
         perror("ERROR:: msgrcv");
         exit(1);
     }
 
-    printf("received message of size %d\n", size_of_last_message);
+    printf("received message of size %d\n", rcvMsg.size);
 
     /* Keep receiving until the sender set the size to 0, indicating that
      * there is no more data to send
      */
-    while (size_of_last_message != 0) {
+    while (rcvMsg.size != 0) {
         /* If the sender is not telling us that we are done, then get to work */
-        if (size_of_last_message != 0) {
+        if (rcvMsg.size != 0) {
             /* Save the shared memory to file */
             printf("writing shared memory to file\n");
             if (fwrite(sharedMemPtr, sizeof(char), rcvMsg.size, fp) <= 0) {
@@ -122,13 +121,13 @@ void mainLoop() {
         }
 
         printf("waiting for ready message\n");
-        size_of_last_message = msgrcv(msqid, &rcvMsg, size_of_each_message, rcvMsg.mtype, 0);
-        if (size_of_last_message < 0) {
+        rc = msgrcv(msqid, &rcvMsg, size_of_each_message, rcvMsg.mtype, 0);
+        if (rc < 0) {
             perror("ERROR:: msgrcv");
             exit(1);
         }
 
-        printf("received message of size %d\n", size_of_last_message);
+        printf("received message of size %d\n", rcvMsg.size);
     }
 
     printf("done with loop\n");
