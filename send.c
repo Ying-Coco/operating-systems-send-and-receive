@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+
 /* For the message struct */
 #include "msg.h"
 
@@ -31,15 +32,6 @@ void* sharedMemPtr;
  * @param msqid - the id of the shared memory
  */
 void init() {
-    /* TODO:
-       3. Use the key in the TODO's below. Use the same key for the queue
-       and the shared memory segment. This also serves to illustrate the difference
-       between the key and the id used in message queues and shared memory. The id
-       for any System V objest (i.e. message queues, shared memory, and sempahores)
-       is unique system-wide among all SYstem V objects. Two objects, on the other hand,
-       may have the same key.
-     */
-
     key_t key;
     const char *path = "./keyfile.txt";
     FILE *filePtr;
@@ -51,7 +43,7 @@ void init() {
     }
 
     // put the Hello world string into the keyfile
-    fputs("Hello World", filePtr);
+    fputs("Hello world", filePtr);
     rewind(filePtr);
     key = ftok("keyfile.txt", 'a');
 
@@ -81,11 +73,9 @@ void init() {
  * @param sharedMemPtr - the pointer to the shared memory
  */
 void cleanUp(void** sharedMemPtr) {
+    // this one only needs to detach from the shared mem, because recv will
+    // handle all the dealloc procedures
     shmdt(sharedMemPtr);
-
-    //shmctl(*shmid, IPC_RMID, NULL);
-
-    //msgctl(*msqid, IPC_RMID, NULL);
 }
 
 /**
