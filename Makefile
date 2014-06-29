@@ -2,18 +2,18 @@ CXX_FLAGS=-Wall -Wextra -g
 CXX=gcc
 BIN=$(CXX) $(CXX_FLAGS)
 
-uncrustify:
-	uncrustify --replace --no-backup -c style.cfg *.c
-
-compile: clean recv send
+compile: clean recv sender
 
 recv:
 	$(BIN) recv.c -o recv
 
-send:
-	$(BIN) send.c -o send
+sender:
+	$(BIN) send.c -o sender
+
+uncrustify:
+	uncrustify --replace --no-backup -c style.cfg *.c
 
 clean:
-	rm -f send recv a.out core.*
+	rm -f sender recv a.out core.*
 
 .PHONY: compile

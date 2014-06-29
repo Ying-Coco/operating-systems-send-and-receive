@@ -23,7 +23,7 @@
 *.hex
 
 /recv
-/send
+/sender
 /.local.vimrc
 /.vagrant
 /recvfile
