@@ -32,20 +32,8 @@ void* sharedMemPtr;
  * @param msqid - the id of the shared memory
  */
 void init() {
-    key_t key;
-    const char *path = "./keyfile.txt";
-    FILE *filePtr;
-
-    filePtr = fopen(path, "rw");
-    if (!filePtr) {
-        printf("Error file failed to open");
-        exit(1);
-    }
-
     // put the Hello world string into the keyfile
-    fputs("Hello world", filePtr);
-    rewind(filePtr);
-    key = ftok("keyfile.txt", 'a');
+    key_t key = ftok("keyfile.txt", 'a');
 
     if ((shmid = shmget(key, SHARED_MEMORY_CHUNK_SIZE, IPC_CREAT | 0666)) < 0) {
         perror("ERROR:: shmget");
@@ -75,6 +63,7 @@ void init() {
 void cleanUp(void** sharedMemPtr) {
     // this one only needs to detach from the shared mem, because recv will
     // handle all the dealloc procedures
+    printf("Detaching from shared memory\n");
     shmdt(sharedMemPtr);
 }
 
@@ -105,10 +94,10 @@ void send_t(const char* fileName) {
 
     /* Read the whole file */
     while (!feof(fp)) {
-        printf("beginning loop again\n");
-        /* Read at most SHARED_MEMORY_CHUNK_SIZE from the file and store them in shared memory.
-         * fread will return how many bytes it has actually read (since the last chunk may be less
-         * than SHARED_MEMORY_CHUNK_SIZE).
+        /* Read at most SHARED_MEMORY_CHUNK_SIZE from the file and store them
+         * in shared memory.  fread will return how many bytes it has actually
+         * read (since the last chunk may be less than
+         * SHARED_MEMORY_CHUNK_SIZE).
          */
         sndMsg.size = (int)fread(sharedMemPtr, sizeof(char), SHARED_MEMORY_CHUNK_SIZE, fp);
         if (sndMsg.size < 0) {
@@ -116,32 +105,19 @@ void send_t(const char* fileName) {
             exit(-1);
         }
 
-        /* TODO: Send a message to the receiver telling him that the data is ready
-         * (message of type SENDER_DATA_TYPE)
-         */
-        printf("sending message saying we're ready\n");
         if (msgsnd(msqid, &sndMsg, size_of_each_message, 0) < 0) {
             perror("ERROR:: msgsnd\n");
             exit(1);
         }
 
-        /* TODO: Wait until the receiver sends us a message of type RECV_DONE_TYPE telling us
-         * that he finished saving the memory chunk.
-         */
-        printf("waiting for receiver to be ready\n");
         if (msgrcv(msqid, &rcvMsg, size_of_each_message, rcvMsg.mtype, 0) < 0) {
             perror("ERROR:: msgrcv\n");
             exit(1);
         }
     }
 
-    /** TODO: once we are out of the above loop, we have finished sending the file.
-     * Lets tell the receiver that we have nothing more to send. We will do this by
-     * sending a message of type SENDER_DATA_TYPE with size field set to 0.
-     */
     sndMsg.size = 0;
 
-    printf("sending size 0 msg\n");
     if (msgsnd(msqid, &sndMsg, size_of_each_message, 0) < 0) {
         perror("ERROR:: msgsnd\n");
         exit(1);

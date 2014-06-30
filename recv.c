@@ -74,23 +74,11 @@ void mainLoop() {
         exit(-1);
     }
 
-    /* TODO: Receive the message and get the message size. The message will
-     * contain regular information. The message will be of SENDER_DATA_TYPE
-     * (the macro SENDER_DATA_TYPE is defined in msg.h).  If the size field
-     * of the message is not 0, then we copy that many bytes from the shared
-     * memory region to the file. Otherwise, if 0, then we close the file and
-     * exit.
-     *
-     * NOTE: the received file will always be saved into the file called
-     * "recvfile"
-     */
     rc = msgrcv(msqid, &rcvMsg, size_of_each_message, rcvMsg.mtype, 0);
     if (rc < 0) {
         perror("ERROR:: msgrcv");
         exit(1);
     }
-
-    printf("received message of size %d\n", rcvMsg.size);
 
     /* Keep receiving until the sender set the size to 0, indicating that
      * there is no more data to send
@@ -99,16 +87,10 @@ void mainLoop() {
         /* If the sender is not telling us that we are done, then get to work */
         if (rcvMsg.size != 0) {
             /* Save the shared memory to file */
-            printf("writing shared memory to file\n");
             if (fwrite(sharedMemPtr, sizeof(char), rcvMsg.size, fp) <= 0) {
                 perror("fwrite");
             }
 
-            /* TODO: Tell the sender that we are ready for the next file chunk.
-             * I.e. send a message of type RECV_DONE_TYPE (the value of size field
-             * does not matter in this case).
-             */
-            printf("sending ready message\n");
             rc = msgsnd(msqid, &sndMsg, size_of_each_message, 0);
             if (rc == -1) {
                 perror("ERROR:: msgsnd");
@@ -117,20 +99,17 @@ void mainLoop() {
         } else {
             /* Close the file */
             fclose(fp);
-            printf("closing file\n");
         }
 
-        printf("waiting for ready message\n");
         rc = msgrcv(msqid, &rcvMsg, size_of_each_message, rcvMsg.mtype, 0);
         if (rc < 0) {
             perror("ERROR:: msgrcv");
             exit(1);
         }
 
-        printf("received message of size %d\n", rcvMsg.size);
     }
 
-    printf("done with loop\n");
+    printf("File transferred successfully\n");
 }
 
 /**
@@ -141,12 +120,13 @@ void mainLoop() {
  * @param msqid - the id of the message queue
  */
 void cleanUp(const int shmid, const int msqid, void *sharedMemPtr) {
+    printf("Detaching from shared memory\n");
     shmdt(sharedMemPtr);
 
-    /* Deallocate the shared memory chunk */
+    printf("Cleaning up shared memory\n");
     shmctl(shmid, IPC_RMID, NULL);
 
-    /* Deallocate the message queue */
+    printf("Cleaning up the message queue\n");
     msgctl(msqid, IPC_RMID, NULL);
 }
 
@@ -175,8 +155,6 @@ int main() {
     /* Go to the main loop */
     mainLoop();
 
-    /** TODO: Detach from shared memory segment, and deallocate shared memory
-     * and message queue (i.e. call cleanup) **/
     cleanUp(shmid, msqid, sharedMemPtr);
 
     return 0;
