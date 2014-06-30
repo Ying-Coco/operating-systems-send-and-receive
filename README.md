@@ -2,8 +2,8 @@ operating-systems-send-and-receive
 ==================================
 Authors
 -------
-Ciaran Downey - 891709818  
-Stratton Aguilar -
+Ciaran Downey    - 891709818  
+Stratton Aguilar - 800768442
 
 Running the program
 -------------------
