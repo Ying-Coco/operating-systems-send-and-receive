@@ -1,3 +1,5 @@
+This project is deprecated and unmaintained. Proceed with caution!
+
 operating-systems-send-and-receive
 ==================================
 Authors
